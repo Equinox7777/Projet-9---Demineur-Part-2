@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
     //on crée la grille de cases ici
 
     SDL_Event event;
-    bool quit = false;
+    bool; quit = false;
 
     while (!quit)
     {

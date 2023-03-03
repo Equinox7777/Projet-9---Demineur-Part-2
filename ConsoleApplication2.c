@@ -1,4 +1,3 @@
-#include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -149,7 +148,7 @@ void PlacerDrapeau(char JEU[10][10], int i, int j) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-void Choisir(int choix, char MINES[10][10], char JEU[10][10])
+void Choisir(char MINES[10][10], char JEU[10][10])
 {
     int i, j;
     do
@@ -164,7 +163,7 @@ void Choisir(int choix, char MINES[10][10], char JEU[10][10])
         }
     } while (i < 1 || i > 10 || j < 1 || j > 10);
 
-
+    int choix;
     printf("Vous avez choisi la case (%d,%d).\ Que voulez-vous faire ?\n", i, j);
     i = i - 1;
     j = j - 1;
@@ -224,7 +223,7 @@ int EstTermine(char JEU[10][10], char MINES[10][10])
 int main()
 {
 
-    int choix{};//choix d'une case
+    int choix; {};//choix d'une case
     char JEU[10][10];//grille de jeu
     char MINES[10][10];//grille avec les Mines 
     int NbMines;//Nombre de Mines
@@ -246,7 +245,7 @@ int main()
     CompteMines(MINES);
     while (!EstTermine(JEU, MINES))
     {
-        Choisir(choix, MINES, JEU);
+        Choisir(MINES, JEU);
     }
 
     return 0;
