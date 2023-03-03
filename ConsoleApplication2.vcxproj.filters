@@ -18,7 +18,7 @@
     <ClCompile Include="ConsoleApplication2.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Source.cpp">
+    <ClCompile Include="DemineurGraph.c">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>

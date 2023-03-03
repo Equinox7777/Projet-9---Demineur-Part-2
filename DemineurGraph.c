@@ -1,9 +1,4 @@
-﻿#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include "SDL.h"
-#undef main
-#include <iostream>
+﻿#include "SDL.h"
 
 
 int main(int argc, char* argv[])
@@ -14,7 +9,7 @@ int main(int argc, char* argv[])
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    // Dessinez la grille de cases ici
+    //on crée la grille de cases ici
 
     SDL_Event event;
     bool quit = false;
@@ -28,14 +23,14 @@ int main(int argc, char* argv[])
                 quit = true;
             }
 
-            // Gérez les événements de la souris ici
+            //événements de la souris
         }
 
-        // Mettez à jour la grille de cases ici
+        //mettre à jour la grille de cases
 
         SDL_RenderClear(renderer);
 
-        // Dessinez la grille de cases mise à jour ici
+        //la grille de cases mise à jour ici
 
         SDL_RenderPresent(renderer);
     }
