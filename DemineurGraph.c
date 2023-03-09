@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <SDL.h>
@@ -224,7 +224,7 @@ int EstTermine(char JEU[10][10], char MINES[10][10])
 
 const int ROWS = 10;
 const int COLS = 10;
-
+int NbMines;
 char JEU[10][10];
 char MINES[10][10];
 
@@ -241,7 +241,7 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Erreur SDL_Init : %s", SDL_GetError());
         goto Quit;
     }
-    if (0 != SDL_CreateWindowAndRenderer(640, 600, SDL_WINDOW_SHOWN, &window, &renderer))
+    if (0 != SDL_CreateWindowAndRenderer(500, 500, SDL_WINDOW_SHOWN, &window, &renderer))
     {
         fprintf(stderr, "Erreur SDL_CreateWindowAndRenderer : %s", SDL_GetError());
         goto Quit;
@@ -260,6 +260,8 @@ int main(int argc, char* argv[])
     }
     SDL_FreeSurface(surface);
     surface = NULL;
+
+    PlaceMines(MINES, NbMines);
     statut = EXIT_SUCCESS;
 
     while (1)
@@ -274,11 +276,15 @@ int main(int argc, char* argv[])
             case SDL_MOUSEBUTTONUP:
                 if (event.button.button == SDL_BUTTON_LEFT)
                 {
-                    printf("Clic gauche a la position : (%d, %d)\n", event.button.x, event.button.y);
+                    int i = event.button.y / 50;
+                    int j = event.button.x / 50;
+                    printf("Clic gauche a la position : (%d, %d)\n", event.button.x / 50, event.button.y / 50);
                 }
                 else if (event.button.button == SDL_BUTTON_RIGHT)
                 {
-                    printf("Clic droit a la position : (%d, %d)\n", event.button.x, event.button.y);
+                    int i = event.button.y / 50;
+                    int j = event.button.x / 50;
+                    printf("Clic droit a la position : (%d, %d)\n", event.button.x / 50, event.button.y / 50);
                 }
                 break;
             }
@@ -289,7 +295,6 @@ int main(int argc, char* argv[])
 
         SDL_Rect dst = { 10, 10, 50, 50 };
         SDL_Rect src = { 10, 10, 50, 50 };
-        SDL_Rect mineTexture = { 10, 10, 50, 50 };
 
         for (int i = 0; i < ROWS; i++)
         {
@@ -298,14 +303,8 @@ int main(int argc, char* argv[])
                 dst.x = j * 50;
                 dst.y = i * 50;
 
-                if (MINES[ROWS][COLS] == 'X')
-                {
-                    SDL_RenderCopy(renderer, mineTexture, &src, &dst);
-                }
-                else
-                {
-                    SDL_RenderCopy(renderer, texture, &src, &dst);
-                }
+
+                SDL_RenderCopy(renderer, texture, &src, &dst);
             }
         }
 
