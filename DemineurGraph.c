@@ -1,66 +1,310 @@
-﻿#include <SDL.h>
+﻿#include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
-#include <stdbool.h>
-#include <stdio.h>
+#include <SDL.h>
 
+void Init(char MINES[10][10], char JEU[10][10])
+{
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            JEU[i][j] = '-';
+            MINES[i][j] = '0';
+        }
+    }
+}
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//void AfficheJeu(char JEU[10][10])
+//{
+//    printf("\n\n");
+//    printf("   | 1  2  3  4  5  6  7  8  9  10\n");
+//    printf("___|______________________________\n");
+//    for (int i = 0; i < 10; i++)
+//    {
+//        if (i < 9)
+//            printf(" %d | ", i + 1);
+//        else
+//            printf("%d | ", i + 1);
+//        for (int j = 0; j < 10; j++)
+//        {
+//            printf("%c  ", JEU[i][j]);
+//        }
+//        printf("\n");
+//    }
+//}
+//
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//void AfficheMines(char MINES[10][10])
+//{
+//    printf("\n\n");
+//    printf("   | 1  2  3  4  5  6  7  8  9  10\n");
+//    printf("___|______________________________\n");
+//    for (int i = 0; i < 10; i++)
+//    {
+//        if (i < 9)
+//            printf(" %d | ", i + 1);
+//        else
+//            printf("%d | ", i + 1);
+//        for (int j = 0; j < 10; j++)
+//        {
+//            printf("%c  ", MINES[i][j]);
+//        }
+//        printf("\n");
+//    }
+//}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void PlaceMines(char MINES[10][10], int NbMines)
+{
+    int Pmines;
+    srand(time(NULL));
+    for (Pmines = 0; Pmines < NbMines; Pmines++)
+    {
+        int i = rand() % 10;
+        int j = rand() % 10;
+        if (MINES[i][j] == '0')
+        {
+            MINES[i][j] = 'X';
+        }
+        else
+        {
+            NbMines++;
+        }
+    }
+}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void CompteMines(char MINES[10][10])
+{
+    int i, j, nbMines;
 
-#define NUM_ROWS 15
-#define NUM_COLS 15
-#define CASE_SIZE 20
-#define GRID_OFFSET_X 150
-#define GRID_OFFSET_Y 100
+    for (i = 0; i < 10; i++)
+    {
+        for (j = 0; j < 10; j++)
+        {
+            nbMines = 0;
+            if (MINES[i][j] == '0' && MINES[i][j] != 'X')
+            {
+                // Compter les mines autour de la case vide
+                int k, l;
+                for (k = i - 1; k <= i + 1; k++)
+                {
+                    for (l = j - 1; l <= j + 1; l++)
+                    {
+                        if (k >= 0 && k < 10 && l >= 0 && l < 10 && MINES[k][l] == 'X')
+                        {
+                            nbMines++;
+                        }
+                    }
+                }
+                if (nbMines > 0)
+                {
+                    MINES[i][j] = '0' + nbMines;
+                }
+            }
+        }
+    }
+}
 
-typedef struct Case {
-    bool mine;
-    bool decouvert;
-    int chiffre;
-} Case;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void DecouvrirCase(char MINES[10][10], char JEU[10][10], int i, int j)
+{
+    if (MINES[i][j] != ' ')
+    {
+        JEU[i][j] = MINES[i][j];
+    }
 
-Case cases[NUM_ROWS][NUM_COLS];
+    if (MINES[i][j] == '0')
+    {
+        for (int k = i - 1; k <= i + 1; k++)
+        {
+            for (int l = j - 1; l <= j + 1; l++)
+            {
+                if (k >= 0 && k < 10 && l >= 0 && l < 10) //est-ce que la case est dans la grille
+                {
 
-void Init(SDL_Renderer* renderer);
-void AfficheJeu(SDL_Renderer* renderer);
-void AfficheMine(SDL_Renderer* renderer);
-void DecouvreCase(SDL_Renderer* renderer, int row, int col);
-void DecouvreVoisines(SDL_Renderer* renderer, int row, int col);
-void AfficheChiffre(SDL_Renderer* renderer, int row, int col, int chiffre);
+                    if (MINES[k][l] == '0' && JEU[k][l] == '-') //On vérifie que la case contient un zéro
+                    {
+                        JEU[k][l] = '0';
+                        DecouvrirCase(MINES, JEU, k, l);
+                    }
+                    else if (MINES[k][l] != '0' && JEU[k][l] == '-') //On découvre toutes les case non vide autour
+                    {
+                        JEU[k][l] = MINES[k][l];
+                    }
+                }
+            }
+        }
+    }
+
+}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void PlacerDrapeau(char JEU[10][10], int i, int j) {
+    JEU[i][j] = '@';
+}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//void Choisir(char MINES[10][10], char JEU[10][10])
+//{
+//    int i, j;
+//    do
+//    {
+//        printf("\n");
+//        printf("Veuillez entrer la case choisie (numero de ligne [espace] numero de colonne) : ");
+//        while (scanf_s("%d %d", &i, &j) == 0)
+//        {
+//            printf("Vous devez saisir deux nombres avec un [espace] entre !\n");
+//            while (getchar() != '\n')
+//                continue;
+//        }
+//    } while (i < 1 || i > 10 || j < 1 || j > 10);
+//
+//    int choix;
+//    printf("Vous avez choisi la case (%d,%d). Que voulez-vous faire ?\n", i, j);
+//    i = i - 1;
+//    j = j - 1;
+//    do
+//    {
+//        printf("\t1. Decouvrir une case\n");
+//        printf("\t2. Placer un drapeau\n");
+//        printf("\t\tVotre choix : ");
+//        while (scanf_s("%d", &choix) == 0)
+//        {
+//            printf("\tVous devez saisir 1 ou 2 !\n");
+//            while (getchar() != '\n')
+//                continue;
+//        }
+//    } while (choix < 0 || choix>2);
+//
+//    if (choix == 1)
+//    {
+//        DecouvrirCase(MINES, JEU, i, j);
+//        if (MINES[i][j] == 'X')
+//        {
+//            AfficheMines(MINES);
+//            printf("\tBOOM! perdu......\n");
+//            exit(0);
+//        }
+//
+//        AfficheJeu(JEU);
+//    }
+//    else if (choix == 2)
+//    {
+//        PlacerDrapeau(JEU, i, j);
+//        AfficheJeu(JEU);
+//    }
+//}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+int EstTermine(char JEU[10][10], char MINES[10][10])
+{
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            if (JEU[i][j] == '-' && MINES[i][j] != 'X')
+            {
+                return 0;
+            }
+        }
+    }
+    printf("\n");
+    printf("GG mec!");
+    printf("\n");
+    return 1;
+}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+const int ROWS = 10;
+const int COLS = 10;
+
+char JEU[10][10];
+char MINES[10][10];
 
 int main(int argc, char* argv[])
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Window* window = NULL;
+    SDL_Renderer* renderer = NULL;
+    SDL_Surface* surface = NULL;
+    SDL_Texture* texture = NULL;
+    int statut = EXIT_FAILURE;
 
-    SDL_Window* window = SDL_CreateWindow("Demineur", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-    SDL_Event event;
-    bool quit = false;
-
-    srand(time(NULL));
-
-    Init(renderer);
-    AfficheJeu(renderer);
-    AfficheMine(renderer);
-
-    while (!quit)
+    if (0 != SDL_Init(SDL_INIT_VIDEO))
     {
-        while (SDL_PollEvent(&event) != 0)
+        fprintf(stderr, "Erreur SDL_Init : %s", SDL_GetError());
+        goto Quit;
+    }
+    if (0 != SDL_CreateWindowAndRenderer(640, 600, SDL_WINDOW_SHOWN, &window, &renderer))
+    {
+        fprintf(stderr, "Erreur SDL_CreateWindowAndRenderer : %s", SDL_GetError());
+        goto Quit;
+    }
+    surface = SDL_LoadBMP("src/case_0.bmp");
+    if (NULL == surface)
+    {
+        fprintf(stderr, "Erreur SDL_LoadBMP : %s", SDL_GetError());
+        goto Quit;
+    }
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (NULL == texture)
+    {
+        fprintf(stderr, "Erreur SDL_CreateTextureFromSurface : %s", SDL_GetError());
+        goto Quit;
+    }
+    SDL_FreeSurface(surface);
+    surface = NULL;
+    statut = EXIT_SUCCESS;
+
+    while (1)
+    {
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT)
+            switch (event.type)
             {
-                quit = true;
-            }
-            else if (event.type == SDL_MOUSEBUTTONDOWN)
-            {
-                int x, y;
-                SDL_GetMouseState(&x, &y);
-
-                int row = (y - GRID_OFFSET_Y) / CASE_SIZE;
-                int col = (x - GRID_OFFSET_X) / CASE_SIZE;
-
-                if (row >= 0 && row < NUM_ROWS && col >= 0 && col < NUM_COLS)
+            case SDL_QUIT:
+                goto Quit;
+            case SDL_MOUSEBUTTONUP:
+                if (event.button.button == SDL_BUTTON_LEFT)
                 {
-                    DecouvreCase(renderer, row, col);
+                    printf("Clic gauche a la position : (%d, %d)\n", event.button.x, event.button.y);
+                }
+                else if (event.button.button == SDL_BUTTON_RIGHT)
+                {
+                    printf("Clic droit a la position : (%d, %d)\n", event.button.x, event.button.y);
+                }
+                break;
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+
+        SDL_Rect dst = { 10, 10, 50, 50 };
+        SDL_Rect src = { 10, 10, 50, 50 };
+        SDL_Rect mineTexture = { 10, 10, 50, 50 };
+
+        for (int i = 0; i < ROWS; i++)
+        {
+            for (int j = 0; j < COLS; j++)
+            {
+                dst.x = j * 50;
+                dst.y = i * 50;
+
+                if (MINES[ROWS][COLS] == 'X')
+                {
+                    SDL_RenderCopy(renderer, mineTexture, &src, &dst);
+                }
+                else
+                {
+                    SDL_RenderCopy(renderer, texture, &src, &dst);
                 }
             }
         }
@@ -68,139 +312,15 @@ int main(int argc, char* argv[])
         SDL_RenderPresent(renderer);
     }
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+Quit:
+    if (NULL != surface)
+        SDL_FreeSurface(surface);
+    if (NULL != texture)
+        SDL_DestroyTexture(texture);
+    if (NULL != renderer)
+        SDL_DestroyRenderer(renderer);
+    if (NULL != window)
+        SDL_DestroyWindow(window);
     SDL_Quit();
-
-    return 0;
+    return statut;
 }
-
-void Init(SDL_Renderer* renderer)
-{
-    SDL_SetRenderDrawColor(renderer, 158, 158, 158, 255);
-    SDL_RenderClear(renderer);
-}
-
-void AfficheJeu(SDL_Renderer* renderer)
-{
-    SDL_SetRenderDrawColor(renderer, 158, 158, 158, 255);
-    SDL_RenderClear(renderer);
-
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
-    for (int row = 0; row < NUM_ROWS; row++)
-    {
-        for (int col = 0; col < NUM_COLS; col++)
-        {
-            SDL_Rect case_rect = { GRID_OFFSET_X + col * CASE_SIZE, GRID_OFFSET_Y + row * CASE_SIZE, CASE_SIZE, CASE_SIZE };
-            SDL_RenderDrawRect(renderer, &case_rect);
-        }
-    }
-
-    SDL_RenderPresent(renderer);
-}
-
-void AfficheMine(SDL_Renderer* renderer)
-{
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
-    for (int i = 0; i < 10; i++)
-    {
-        int row = rand() % NUM_ROWS;
-        int col = rand() % NUM_COLS;
-
-        SDL_Rect mine_rect = { GRID_OFFSET_X + col * CASE_SIZE, GRID_OFFSET_Y + row * CASE_SIZE, CASE_SIZE, CASE_SIZE };
-        SDL_RenderFillRect(renderer, &mine_rect);
-    }
-}
-
-void DecouvreCase(SDL_Renderer* renderer, int row, int col)
-{
-    
-    if (cases[row][col].decouvert) {
-        return;
-    }
-
-    
-    cases[row][col].decouvert = true;
-
-    // case miné
-    if (cases[row][col].mine) {
-        printf("BOOM! Vous avez perdu.\n");
-        exit(0);
-    }
-
-    // cases voisines
-    if (cases[row][col].chiffre == 0) {
-        DecouvreVoisines(renderer, row, col);
-    }
-
-    if (cases[row][col].chiffre > 0) {
-        AfficheChiffre(renderer, row, col, cases[row][col].chiffre);
-    }
-}
-
-void DecouvreVoisines(SDL_Renderer* renderer, int row, int col)
-{
-    // Parcourir les cases voisines
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
-            int r = row + i;
-            int c = col + j;
-            // Vérifier si la case est dans la grille
-            if (r >= 0 && r < NUM_ROWS && c >= 0 && c < NUM_COLS) {
-                // Découvrir la case
-                DecouvreCase(renderer, r, c);
-            }
-        }
-    }
-}
-
-void AfficheChiffre(SDL_Renderer* renderer, int row, int col, int chiffre)
-{
-    SDL_Rect dest_rect = { GRID_OFFSET_X + col * CASE_SIZE, GRID_OFFSET_Y + row * CASE_SIZE, CASE_SIZE, CASE_SIZE };
-
-    SDL_Surface* surface = NULL;
-    SDL_Texture* texture = NULL;
-    switch (chiffre) {
-    case 1:
-        surface = SDL_LoadBMP("src/case_1.bmp");
-        break;
-    case 2:
-        surface = SDL_LoadBMP("src/case_2.bmp");
-        break;
-    case 3:
-        surface = SDL_LoadBMP("src/case_3.bmp");
-        break;
-    case 4:
-        surface = SDL_LoadBMP("src/case_4.bmp");
-        break;
-    case 5:
-        surface = SDL_LoadBMP("src/case_5.bmp");
-        break;
-    case 6:
-        surface = SDL_LoadBMP("src/case_6.bmp");
-        break;
-    case 7:
-        surface = SDL_LoadBMP("src/case_7.bmp");
-        break;
-    case 8:
-        surface = SDL_LoadBMP("src/case_8.bmp");
-        break;
-    }
-
-    if (surface == NULL) {
-        printf("Erreur : impossible de charger l'image %d.bmp.\n", chiffre);
-        return;
-    }
-
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-
-    SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
-
-    SDL_DestroyTexture(texture);
-}
-
-
-
